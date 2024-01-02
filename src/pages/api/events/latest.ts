@@ -25,7 +25,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         })
         .then(posts => {
           if (posts.length) {
-            res.json(posts)
+            res.json(posts[0])
           } else {
             res.status(404).send({ error: "There is no active event" })
           }

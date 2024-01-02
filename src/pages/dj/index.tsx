@@ -18,6 +18,7 @@ import * as z from "zod"
 
 // Types
 import { Event } from "@prisma/client"
+import Link from "next/link"
 
 const formSchema = z.object({
   locationTitle: z.string().min(2, {
@@ -25,7 +26,7 @@ const formSchema = z.object({
   })
 })
 
-const fetcher: Fetcher<Event[], string> = async (url: string) => {
+const fetcher: Fetcher<Event, string> = async (url: string) => {
   const res = await fetch(url)
 
   if (!res.ok) {
@@ -36,6 +37,7 @@ const fetcher: Fetcher<Event[], string> = async (url: string) => {
   return res.json()
 }
 
+// TODO: Extract component
 function EventForm() {
   const { user } = useUser()
   const form = useForm<z.infer<typeof formSchema>>({
@@ -87,6 +89,7 @@ function EventForm() {
               </FormItem>
             )}
           />
+          {/* TODO: Refresh page after save */}
           <Button type='submit' className='bg-green-600 hover:bg-green-500 w-full'>
             <p className='text-lg'>Etkinliği Oluştur</p>
           </Button>
@@ -114,17 +117,17 @@ export default function DjHomePage() {
             {data && (
               <>
                 <h2 className='text-xl'>Etkinlikler</h2>
-                {data?.map(event => (
-                  <div key={event.id} className='flex flex-row space-x-3 items-center'>
+                {data && (
+                  <div key={data.id} className='flex flex-row space-x-3 items-center'>
                     <div className='w-20 h-20 bg-slate-100 border rounded shadow-sm'></div>
                     <div className='flex flex-col space-y-2'>
-                      <p className='text-lg'>{event.locationTitle}</p>
+                      <p className='text-lg'>{data.locationTitle}</p>
                       <p className='text-lg font-light'>
-                        {event.startedAt ? event.startedAt.toLocaleString() : "Etkinlik Henüz Başlamadı"}
+                        {data.startedAt ? data.startedAt.toLocaleString() : "Etkinlik Henüz Başlamadı"}
                       </p>
                     </div>
                   </div>
-                ))}
+                )}
               </>
             )}
           </div>
@@ -132,8 +135,10 @@ export default function DjHomePage() {
           <div className='flex flex-col space-y-2'>
             {error && <EventForm />}
             {data && (
-              <Button className='bg-green-600 hover:bg-green-500'>
-                <p className='text-lg'>Etkinliğe Git</p>
+              <Button className='bg-green-600 hover:bg-green-500' asChild>
+                <Link href={`/events/${data.id}`}>
+                  <p className='text-lg'>Etkinliğe Git</p>
+                </Link>
               </Button>
             )}
             <Button variant='secondary' className='bg-blue-400 hover:bg-blue-300'>
