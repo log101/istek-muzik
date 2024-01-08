@@ -28,7 +28,34 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         .catch(() => {
           res.status(500).send({ error: "Error getting event" })
         })
+    } else if (req.method === "PUT") {
+      const { newLocationTitle } = req.body
+
+      if (!newLocationTitle) {
+        res.status(400).send({ error: "New location title is required" })
+      } else {
+        return prisma.event
+          .update({
+            where: {
+              id: Number(id)
+            },
+            data: {
+              locationTitle: newLocationTitle
+            }
+          })
+          .then(post => {
+            if (post) {
+              res.json(post)
+            } else {
+              res.status(404).send({ error: "Event could not be found" })
+            }
+          })
+          .catch(() => {
+            res.status(500).send({ error: "Event could not be updated" })
+          })
+      }
     } else {
+      // TODO: handle delete method
       res.status(400).send({ error: "HTTP Method Not Supported" })
     }
   }

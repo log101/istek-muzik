@@ -11,6 +11,7 @@ import { zodResolver } from "@hookform/resolvers/zod"
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
 import { toast } from "sonner"
+import { RotateCw } from "lucide-react"
 
 const formSchema = z.object({
   locationTitle: z.string().min(2, {
@@ -49,6 +50,33 @@ const EventPage = () => {
     }
   })
 
+  const handleSave = async (values: z.infer<typeof formSchema>) => {
+    const formData = {
+      newLocationTitle: values.locationTitle
+    }
+
+    await fetch(`/api/events/${router.query.id}`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify(formData)
+    })
+      .then(res => {
+        if (res.ok) {
+          toast.info("Etkinlik güncellendi")
+        } else {
+          throw new Error()
+        }
+      })
+      .catch(() => {
+        toast.error("Etkinlik güncellenemedi, tekrar dener misin?")
+      })
+  }
+
+  // TODO: Show alert
+  const handleDelete = () => console.log("sample")
+
   return (
     <>
       <div className='h-screen flex flex-col'>
@@ -64,7 +92,7 @@ const EventPage = () => {
             <div className='flex flex-col space-y-2'>
               <div className='text-lg'>
                 <Form {...form}>
-                  <form onSubmit={form.handleSubmit((data: any) => console.log(data))} className='space-y-8'>
+                  <form onSubmit={form.handleSubmit(handleSave)} className='space-y-8'>
                     <FormField
                       control={form.control}
                       name='locationTitle'
@@ -81,10 +109,15 @@ const EventPage = () => {
                       )}
                     />
                     <div className='flex flex-col space-y-3'>
-                      <Button type='submit' className='bg-green-600 hover:bg-green-500 w-full' disabled={error}>
+                      <Button
+                        type='submit'
+                        className='bg-green-600 hover:bg-green-500 w-full'
+                        disabled={error || form.formState.isSubmitting}
+                      >
+                        {form.formState.isSubmitting && <RotateCw className='mr-2 h-4 w-4 animate-spin' />}
                         <p className='text-lg'>Kaydet</p>
                       </Button>
-                      <Button variant='destructive' className='w-full' disabled={error}>
+                      <Button variant='destructive' className='w-full' disabled={error} onClick={handleDelete}>
                         <p className='text-lg'>Etkinliği Sil</p>
                       </Button>
                       <Button variant='secondary' className='w-full'>
