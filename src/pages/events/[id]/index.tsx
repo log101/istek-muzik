@@ -18,6 +18,7 @@ const fetcher: Fetcher<Event, string> = async (url: string) => {
   return res.json()
 }
 
+// TODO: Extract to a different component
 const QrCodeImage = ({ url = "#" }: { url: string }) => {
   return (
     <>
@@ -72,7 +73,9 @@ const EventPage = () => {
                   <p className='text-lg'>Etkinliği Başlat</p>
                 </Button>
                 <Button variant='secondary' className='bg-blue-400 hover:bg-blue-300'>
-                  <p className='text-lg'>Etkinliği Düzenle</p>
+                  <Link href={`/events/${router.query.id}/edit`}>
+                    <p className='text-lg'>Etkinliği Düzenle</p>
+                  </Link>
                 </Button>
                 <Button>
                   <p className='text-lg'>Paylaş</p>
