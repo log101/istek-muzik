@@ -1,5 +1,5 @@
 // SWR
-import useSWR, { Fetcher } from "swr"
+import useSWR, { Fetcher, mutate } from "swr"
 
 // Clerk
 import { UserButton, useUser } from "@clerk/nextjs"
@@ -19,6 +19,7 @@ import * as z from "zod"
 // Types
 import { Event } from "@prisma/client"
 import Link from "next/link"
+import { RotateCw } from "lucide-react"
 
 const formSchema = z.object({
   locationTitle: z.string().min(2, {
@@ -40,6 +41,7 @@ const fetcher: Fetcher<Event, string> = async (url: string) => {
 // TODO: Extract component
 function EventForm() {
   const { user } = useUser()
+
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -53,7 +55,7 @@ function EventForm() {
         locationTitle: values.locationTitle
       }
 
-      fetch("/api/events", {
+      await fetch("/api/events", {
         method: "POST",
         headers: {
           "Content-Type": "application/json"
@@ -62,6 +64,7 @@ function EventForm() {
       })
         .then(res => {
           if (res.ok) {
+            mutate("/api/events/latest")
             toast("Etkinlik oluşturuldu, aksiyon zamanı!")
           } else {
             throw new Error()
@@ -89,8 +92,12 @@ function EventForm() {
               </FormItem>
             )}
           />
-          {/* TODO: Refresh page after save */}
-          <Button type='submit' className='bg-green-600 hover:bg-green-500 w-full'>
+          <Button
+            type='submit'
+            className='bg-green-600 hover:bg-green-500 w-full'
+            disabled={form.formState.isSubmitting}
+          >
+            {form.formState.isSubmitting && <RotateCw className='mr-2 h-4 w-4 animate-spin' />}
             <p className='text-lg'>Etkinliği Oluştur</p>
           </Button>
         </form>
@@ -100,7 +107,9 @@ function EventForm() {
 }
 
 export default function DjHomePage() {
-  const { data, error } = useSWR("/api/events/latest", fetcher)
+  const { data, error } = useSWR("/api/events/latest", fetcher, {
+    revalidateOnMount: true
+  })
 
   return (
     <>
@@ -113,38 +122,49 @@ export default function DjHomePage() {
         <Separator />
 
         <div className='container flex flex-col space-y-3 py-4 h-full'>
-          <div className='flex flex-col space-y-2'>
-            {data && (
-              <>
-                <h2 className='text-xl'>Etkinlikler</h2>
-                {data && (
-                  <div key={data.id} className='flex flex-row space-x-3 items-center'>
-                    <div className='w-20 h-20 bg-slate-100 border rounded shadow-sm'></div>
-                    <div className='flex flex-col space-y-2'>
-                      <p className='text-lg'>{data.locationTitle}</p>
-                      <p className='text-lg font-light'>
-                        {data.startedAt ? data.startedAt.toLocaleString() : "Etkinlik Henüz Başlamadı"}
-                      </p>
-                    </div>
-                  </div>
-                )}
-              </>
-            )}
-          </div>
-
-          <div className='flex flex-col space-y-2'>
-            {error && <EventForm />}
-            {data && (
-              <Button className='bg-green-600 hover:bg-green-500' asChild>
-                <Link href={`/events/${data.id}`}>
-                  <p className='text-lg'>Etkinliğe Git</p>
-                </Link>
+          {error ? (
+            <>
+              <EventForm />
+              <Button variant='secondary' className='bg-blue-400 hover:bg-blue-300'>
+                <p className='text-lg'>Tavsiyelerini Düzenle</p>
               </Button>
-            )}
-            <Button variant='secondary' className='bg-blue-400 hover:bg-blue-300'>
-              <p className='text-lg'>Tavsiyelerini Düzenle</p>
-            </Button>
-          </div>
+            </>
+          ) : (
+            // TODO: Extract to component
+            data && (
+              <>
+                <div className='flex flex-col space-y-2'>
+                  <>
+                    <h2 className='text-xl'>Etkinlikler</h2>
+                    {data && (
+                      <div key={data.id} className='flex flex-row space-x-3 items-center'>
+                        <div className='w-20 h-20 bg-slate-100 border rounded shadow-sm'></div>
+                        <div className='flex flex-col space-y-2'>
+                          <p className='text-lg'>{data.locationTitle}</p>
+                          <p className='text-lg font-light'>
+                            {data.startedAt ? data.startedAt.toLocaleString() : "Etkinlik Henüz Başlamadı"}
+                          </p>
+                        </div>
+                      </div>
+                    )}
+                  </>
+                </div>
+
+                <div className='flex flex-col space-y-2'>
+                  {data && (
+                    <Button className='bg-green-600 hover:bg-green-500' asChild>
+                      <Link href={`/events/${data.id}`}>
+                        <p className='text-lg'>Etkinliğe Git</p>
+                      </Link>
+                    </Button>
+                  )}
+                  <Button variant='secondary' className='bg-blue-400 hover:bg-blue-300'>
+                    <p className='text-lg'>Tavsiyelerini Düzenle</p>
+                  </Button>
+                </div>
+              </>
+            )
+          )}
         </div>
       </div>
     </>

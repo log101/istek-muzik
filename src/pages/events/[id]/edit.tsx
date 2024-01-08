@@ -12,6 +12,7 @@ import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, For
 import { Input } from "@/components/ui/input"
 import { toast } from "sonner"
 import { RotateCw } from "lucide-react"
+import { useState } from "react"
 
 const formSchema = z.object({
   locationTitle: z.string().min(2, {
@@ -32,6 +33,7 @@ const fetcher: Fetcher<Event, string> = async (url: string) => {
 
 const EventPage = () => {
   const router = useRouter()
+  const [deleting, setDeleting] = useState(false)
 
   const { data, error } = useSWR(`/api/events/${router.query.id}`, fetcher, {
     onSuccess(data) {
@@ -74,8 +76,27 @@ const EventPage = () => {
       })
   }
 
-  // TODO: Show alert
-  const handleDelete = () => console.log("sample")
+  const handleDelete = async () => {
+    setDeleting(true)
+    await fetch(`/api/events/${router.query.id}`, {
+      method: "DELETE",
+      headers: {
+        "Content-Type": "application/json"
+      }
+    })
+      .then(res => {
+        if (res.ok) {
+          toast.info("Etkinlik silindi")
+          router.replace("/dj")
+        } else {
+          throw new Error()
+        }
+      })
+      .catch(() => {
+        toast.error("Etkinlik silinemedi, tekrar dener misin?")
+        setDeleting(false)
+      })
+  }
 
   return (
     <>
@@ -108,7 +129,7 @@ const EventPage = () => {
                         </FormItem>
                       )}
                     />
-                    <div className='flex flex-col space-y-3'>
+                    <div className='flex flex-col'>
                       <Button
                         type='submit'
                         className='bg-green-600 hover:bg-green-500 w-full'
@@ -117,17 +138,20 @@ const EventPage = () => {
                         {form.formState.isSubmitting && <RotateCw className='mr-2 h-4 w-4 animate-spin' />}
                         <p className='text-lg'>Kaydet</p>
                       </Button>
-                      <Button variant='destructive' className='w-full' disabled={error} onClick={handleDelete}>
-                        <p className='text-lg'>Etkinliği Sil</p>
-                      </Button>
-                      <Button variant='secondary' className='w-full'>
-                        <Link href={`/events/${router.query.id}`}>
-                          <p className='text-lg'>Geri Dön</p>
-                        </Link>
-                      </Button>
                     </div>
                   </form>
                 </Form>
+                <div className='flex flex-col space-y-3 mt-3'>
+                  <Button variant='destructive' className='w-full' disabled={error || deleting} onClick={handleDelete}>
+                    {deleting && <RotateCw className='mr-2 h-4 w-4 animate-spin' />}
+                    <p className='text-lg'>Etkinliği Sil</p>
+                  </Button>
+                  <Button variant='secondary' className='w-full'>
+                    <Link href={`/events/${router.query.id}`}>
+                      <p className='text-lg'>Geri Dön</p>
+                    </Link>
+                  </Button>
+                </div>
               </div>
             </div>
             <div className='flex flex-col space-y-3'></div>

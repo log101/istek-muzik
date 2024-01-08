@@ -43,9 +43,9 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
               locationTitle: newLocationTitle
             }
           })
-          .then(post => {
-            if (post) {
-              res.json(post)
+          .then(event => {
+            if (event) {
+              res.json(event)
             } else {
               res.status(404).send({ error: "Event could not be found" })
             }
@@ -54,8 +54,24 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
             res.status(500).send({ error: "Event could not be updated" })
           })
       }
+    } else if (req.method === "DELETE") {
+      return prisma.event
+        .delete({
+          where: {
+            id: Number(id)
+          }
+        })
+        .then(event => {
+          if (event) {
+            res.json(event)
+          } else {
+            res.status(404).send({ error: "Event could not be deleted" })
+          }
+        })
+        .catch(() => {
+          res.status(500).send({ error: "Event could not be deleted" })
+        })
     } else {
-      // TODO: handle delete method
       res.status(400).send({ error: "HTTP Method Not Supported" })
     }
   }
