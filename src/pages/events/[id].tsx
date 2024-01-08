@@ -1,10 +1,11 @@
 import { Button } from "@/components/ui/button"
 import { Separator } from "@/components/ui/separator"
-import { UserButton } from "@clerk/nextjs"
+import { UserButton, useAuth } from "@clerk/nextjs"
 import { useRouter } from "next/router"
 import useSWR, { Fetcher } from "swr"
 import { Event } from "@prisma/client"
 import Link from "next/link"
+import Script from "next/script"
 
 const fetcher: Fetcher<Event, string> = async (url: string) => {
   const res = await fetch(url)
@@ -17,8 +18,32 @@ const fetcher: Fetcher<Event, string> = async (url: string) => {
   return res.json()
 }
 
+const QrCodeImage = ({ url = "#" }: { url: string }) => {
+  return (
+    <>
+      <div id='qrcode' className='flex justify-center'></div>
+      <Script
+        src='/js/qrcode.min.js'
+        onReady={() =>
+          // @ts-expect-error imported script
+          new QRCode(document.getElementById("qrcode"), {
+            text: url,
+            width: 256,
+            height: 256,
+            colorDark: "#000000",
+            colorLight: "#ffffff",
+            // @ts-expect-error imported script
+            correctLevel: QRCode.CorrectLevel.H
+          })
+        }
+      />
+    </>
+  )
+}
+
 const EventPage = () => {
   const router = useRouter()
+  const { userId } = useAuth()
 
   // TODO: Add error handling
   const { data } = useSWR(`/api/events/${router.query.id}`, fetcher)
@@ -36,8 +61,7 @@ const EventPage = () => {
         {data && (
           <>
             <div className='container flex flex-col space-y-8 py-4 h-full justify-center'>
-              {/* Show dj qr code */}
-              <div id='qrcode' className='flex justify-center'></div>
+              <QrCodeImage url={`localhost:3000/dj/${userId}`} />
               <div className='flex flex-col space-y-2'>
                 <div className='text-lg'>
                   <span className='font-semibold'>Etkinliğin Mekanı:</span> {data.locationTitle}
