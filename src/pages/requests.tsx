@@ -33,7 +33,6 @@ export default function Home() {
             <h4 className='scroll-m-20 text-2xl font-semibold tracking-tight'>Tüm Parçalar</h4>
             <p className='text-sm text-muted-foreground'>Gün boyunca istenen tüm parçaları burada bulabilirsin.</p>
           </div>
-          <Separator />
 
           <div className='flex flex-col gap-4'>
             {[1, 2, 3, 4, 5, 6, 7, 8, 9].map(element => (

@@ -19,11 +19,52 @@ import {
 } from "@/components/ui/dialog"
 import { Label } from "@/components/ui/label"
 import { useState } from "react"
+import useSWR, { Fetcher } from "swr"
+import { useRouter } from "next/router"
 
 const inter = Inter({ subsets: ["latin"] })
 
+const fetcher: Fetcher<
+  {
+    tracks: { items: { id: string; name: string; artists: { name: string }[]; album: { images: { url: string }[] } }[] }
+  },
+  string
+> = async (url: string) => {
+  const res = await fetch(url)
+
+  if (!res.ok) {
+    const error = new Error("An error occurred while fetching the data.")
+    throw error
+  }
+
+  return res.json()
+}
+
 export default function NewRequestPage() {
-  const [query, setQuery] = useState("")
+  const router = useRouter()
+
+  const [query, setQuery] = useState(router.query.q ?? "")
+  const [token, setToken] = useState("")
+
+  const getKey = async () => {
+    await fetch("/api/search/music", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      }
+    })
+      .then(async res => {
+        if (res.ok) {
+          const data = await res.json()
+          setToken(data.access_token)
+        } else {
+          throw new Error()
+        }
+      })
+      .catch(() => console.error("Etkinlik oluşturulamadı, tekrar dener misin?"))
+  }
+
+  const { data } = useSWR(query.length > 2 ? `/api/search/music?q=${query}&token=${token}` : null, fetcher)
 
   return (
     <main className={`min-h-screen flex flex-col  ${inter.className}`}>
@@ -41,34 +82,58 @@ export default function NewRequestPage() {
 
       <Separator />
 
-      <div className='container flex flex-col space-y-6 py-4 h-full'>
+      <div className='container flex flex-col space-y-4 py-4 h-full'>
         <div className='flex flex-col gap-3'>
           <Link href='/' className='flex flex-row items-center text-sm text-muted-foreground'>
             <ChevronLeft /> <p>Geri Dön</p>
           </Link>
 
-          <h4 className='scroll-m-20 text-2xl font-semibold tracking-tight'>Hangi şarkı çalsın istersin?</h4>
-          <Input
-            placeholder='Müzik Ara...'
-            className='text-lg'
-            value={query}
-            onChange={e => setQuery(e.target.value)}
-          />
+          <div className='flex flex-col gap-2'>
+            <h4 className='scroll-m-20 text-2xl font-semibold tracking-tight'>Hangi şarkı çalsın istersin?</h4>
+            <p className='text-sm text-muted-foreground leading-5'>
+              Çalmasını istediğin şarkının adını yaz, istekte bulunmak için üzerine tıklaman yeterli.
+            </p>
+          </div>
+
+          <div className='mb-1'>
+            <Input
+              autoFocus
+              placeholder='Müzik Ara...'
+              className='text-lg'
+              value={query}
+              onChange={async e => {
+                if (token) {
+                  setQuery(e.target.value)
+                } else {
+                  getKey()
+                  setQuery(e.target.value)
+                }
+              }}
+            />
+
+            {query.length < 3 && query.length > 0 && (
+              <p className='text-sm text-muted-foreground'>En az üç karakter girmelisin.</p>
+            )}
+          </div>
         </div>
 
         <div className='flex flex-col gap-3'>
           <div className='flex flex-col gap-4'>
-            {[1, 2, 3, 4, 5, 6, 7, 8, 9].map(element => (
-              <Dialog key={element}>
+            {data?.tracks.items.map(track => (
+              <Dialog key={track.id}>
                 <DialogTrigger asChild>
                   <div className='flex flex-row gap-4 justify-items-stretch'>
-                    <div className='w-[64px] h-[64px] bg-slate-300 rounded-lg'></div>
-                    <div className='flex flex-col justify-center'>
-                      <p className='text-lg'>Ara Beni Lütfen</p>
-                      <p className='text-lg text-muted-foreground'>Kenan Doğulu</p>
+                    <Image
+                      src={track.album.images?.[0].url}
+                      alt='logo'
+                      width={64}
+                      height={64}
+                      className='rounded-lg border border-slate-800 h-[64px] w-[64px]'
+                    />
+                    <div className='flex flex-col '>
+                      <p className='text-lg'>{track.name}</p>
+                      <p className='text-lg text-muted-foreground'>{track.artists?.[0].name}</p>
                     </div>
-
-                    <p className='text-sm text-muted-foreground text-right flex-1 self-end'>@esra.key</p>
                   </div>
                 </DialogTrigger>
                 <DialogContent className='sm:max-w-[425px]'>
@@ -79,6 +144,19 @@ export default function NewRequestPage() {
                     </DialogDescription>
                   </DialogHeader>
                   <div className='grid gap-4 py-4'>
+                    <div className='flex flex-row gap-4 justify-items-stretch'>
+                      <Image
+                        src={track.album.images?.[0].url}
+                        alt='logo'
+                        width={64}
+                        height={64}
+                        className='rounded-lg border border-slate-800 h-[64px] w-[64px]'
+                      />
+                      <div className='flex flex-col '>
+                        <p className='text-lg'>{track.name}</p>
+                        <p className='text-lg text-muted-foreground'>{track.artists?.[0].name}</p>
+                      </div>
+                    </div>
                     <div className='grid grid-cols-4 items-center gap-4'>
                       <Label htmlFor='name' className='text-right'>
                         Instagram Adın
@@ -92,6 +170,42 @@ export default function NewRequestPage() {
                 </DialogContent>
               </Dialog>
             ))}
+
+            {!query && (
+              <>
+                <Separator />
+                <p className='text-muted-foreground'>Kararsız kaldıysan mekanın sana özel tavsiyelerine göz at!</p>
+                <div className='flex flex-col gap-4'>
+                  <div className='flex flex-row gap-4 justify-items-stretch'>
+                    <div className='w-[64px] h-[64px] bg-slate-300 rounded-lg'></div>
+                    <div className='flex flex-col justify-center'>
+                      <p className='text-lg'>Ara Beni Lütfen</p>
+                      <p className='text-lg text-muted-foreground'>Kenan Doğulu</p>
+                    </div>
+                  </div>
+                </div>
+
+                <div className='flex flex-col gap-4'>
+                  <div className='flex flex-row gap-4 justify-items-stretch'>
+                    <div className='w-[64px] h-[64px] bg-slate-300 rounded-lg'></div>
+                    <div className='flex flex-col justify-center'>
+                      <p className='text-lg'>Ara Beni Lütfen</p>
+                      <p className='text-lg text-muted-foreground'>Kenan Doğulu</p>
+                    </div>
+                  </div>
+                </div>
+
+                <div className='flex flex-col gap-4'>
+                  <div className='flex flex-row gap-4 justify-items-stretch'>
+                    <div className='w-[64px] h-[64px] bg-slate-300 rounded-lg'></div>
+                    <div className='flex flex-col justify-center'>
+                      <p className='text-lg'>Ara Beni Lütfen</p>
+                      <p className='text-lg text-muted-foreground'>Kenan Doğulu</p>
+                    </div>
+                  </div>
+                </div>
+              </>
+            )}
           </div>
         </div>
       </div>
