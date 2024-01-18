@@ -1,5 +1,4 @@
 import { Inter } from "next/font/google"
-import { UserButton } from "@clerk/nextjs"
 import { Separator } from "@/components/ui/separator"
 import Image from "next/image"
 import { Input } from "@/components/ui/input"
@@ -22,6 +21,7 @@ import { zodResolver } from "@hookform/resolvers/zod"
 import * as z from "zod"
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel } from "@/components/ui/form"
 import { DialogClose } from "@radix-ui/react-dialog"
+import Navbar from "@/components/navbar"
 
 const formSchema = z.object({
   instagramHandle: z.string().min(2, {
@@ -49,17 +49,7 @@ export default function Home() {
 
   return (
     <main className={`min-h-screen flex flex-col  ${inter.className}`}>
-      <div className='container flex flex-row items-center justify-between align-center py-4'>
-        <div></div>
-        <Image
-          src='/img/istek-muzik-logo-tek.png'
-          alt='logo'
-          width={48}
-          height={48}
-          className='rounded-full border border-slate-800'
-        />
-        <UserButton afterSignOutUrl='/' />
-      </div>
+      <Navbar />
 
       <Separator />
 
