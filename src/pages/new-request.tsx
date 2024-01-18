@@ -92,7 +92,7 @@ export default function NewRequestPage() {
   )
 
   return (
-    <main className={`min-h-screen flex flex-col  ${inter.className}`}>
+    <main className={`min-h-screen flex flex-col ${inter.className}`}>
       <div className='container flex flex-row items-center justify-between align-center py-4'>
         <div></div>
         <Image
