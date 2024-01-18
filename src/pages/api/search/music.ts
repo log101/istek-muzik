@@ -31,12 +31,15 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       const searchQuery = encodeURIComponent(req.query.q as string)
       const searchType = "track"
 
-      const searchResponse = await fetch(`https://api.spotify.com/v1/search?q=${searchQuery}&type=${searchType}`, {
-        method: "GET",
-        headers: {
-          Authorization: `Bearer ${req.query.token}`
+      const searchResponse = await fetch(
+        `https://api.spotify.com/v1/search?q=${searchQuery}&type=${searchType}&market=TR`,
+        {
+          method: "GET",
+          headers: {
+            Authorization: `Bearer ${req.query.token}`
+          }
         }
-      })
+      )
 
       if (!searchResponse.ok) {
         throw new Error(`HTTP error! Status: ${searchResponse.status} ${searchResponse}`)

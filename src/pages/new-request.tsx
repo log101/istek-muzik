@@ -21,6 +21,17 @@ import { Label } from "@/components/ui/label"
 import { useState } from "react"
 import useSWR, { Fetcher } from "swr"
 import { useRouter } from "next/router"
+import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel } from "@/components/ui/form"
+import { DialogClose } from "@radix-ui/react-dialog"
+import { useForm } from "react-hook-form"
+import { zodResolver } from "@hookform/resolvers/zod"
+import * as z from "zod"
+
+const formSchema = z.object({
+  instagramHandle: z.string().min(2, {
+    message: "Lütfen instagram isminizi doğru girdiğinize emin olunuz."
+  })
+})
 
 const inter = Inter({ subsets: ["latin"] })
 
@@ -43,6 +54,17 @@ const fetcher: Fetcher<
 export default function NewRequestPage() {
   const router = useRouter()
 
+  const form = useForm<z.infer<typeof formSchema>>({
+    resolver: zodResolver(formSchema),
+    defaultValues: {
+      instagramHandle: ""
+    }
+  })
+
+  function onSubmit(values: z.infer<typeof formSchema>) {
+    console.log(values)
+  }
+
   const [query, setQuery] = useState(router.query.q ?? "")
   const [token, setToken] = useState("")
 
@@ -64,7 +86,10 @@ export default function NewRequestPage() {
       .catch(() => console.error("Etkinlik oluşturulamadı, tekrar dener misin?"))
   }
 
-  const { data } = useSWR(query.length > 2 ? `/api/search/music?q=${query}&token=${token}` : null, fetcher)
+  const { data } = useSWR(
+    query.length > 2 && token.length ? `/api/search/music?q=${query}&token=${token}` : null,
+    fetcher
+  )
 
   return (
     <main className={`min-h-screen flex flex-col  ${inter.className}`}>
@@ -102,7 +127,7 @@ export default function NewRequestPage() {
               className='text-lg'
               value={query}
               onChange={async e => {
-                if (token) {
+                if (token.length) {
                   setQuery(e.target.value)
                 } else {
                   getKey()
@@ -112,7 +137,7 @@ export default function NewRequestPage() {
             />
 
             {query.length < 3 && query.length > 0 && (
-              <p className='text-sm text-muted-foreground'>En az üç karakter girmelisin.</p>
+              <p className='text-sm text-muted-foreground mt-2'>En az üç karakter girmelisin.</p>
             )}
           </div>
         </div>
@@ -175,35 +200,207 @@ export default function NewRequestPage() {
               <>
                 <Separator />
                 <p className='text-muted-foreground'>Kararsız kaldıysan mekanın sana özel tavsiyelerine göz at!</p>
-                <div className='flex flex-col gap-4'>
-                  <div className='flex flex-row gap-4 justify-items-stretch'>
-                    <div className='w-[64px] h-[64px] bg-slate-300 rounded-lg'></div>
-                    <div className='flex flex-col justify-center'>
-                      <p className='text-lg'>Ara Beni Lütfen</p>
-                      <p className='text-lg text-muted-foreground'>Kenan Doğulu</p>
+                <Dialog>
+                  <DialogTrigger asChild>
+                    <div className='flex flex-row gap-4 justify-items-stretch'>
+                      <Image
+                        src='/img/ara-beni-lutfen.webp'
+                        alt='logo'
+                        width={64}
+                        height={64}
+                        className='rounded-lg border border-slate-800 h-[64px] w-[64px]'
+                      />
+                      <div className='flex flex-col'>
+                        <p className='text-lg'>Ara Beni Lütfen</p>
+                        <p className='text-lg text-muted-foreground'>Kenan Doğulu</p>
+                      </div>
                     </div>
-                  </div>
-                </div>
-
-                <div className='flex flex-col gap-4'>
-                  <div className='flex flex-row gap-4 justify-items-stretch'>
-                    <div className='w-[64px] h-[64px] bg-slate-300 rounded-lg'></div>
-                    <div className='flex flex-col justify-center'>
-                      <p className='text-lg'>Ara Beni Lütfen</p>
-                      <p className='text-lg text-muted-foreground'>Kenan Doğulu</p>
+                  </DialogTrigger>
+                  <DialogContent className='sm:max-w-[425px]'>
+                    <DialogHeader>
+                      <DialogTitle>Müzik İsteği Gönder</DialogTitle>
+                      <DialogDescription>
+                        Aşağıya instagram ismini yaz ve isteğini gönder. Unutma, günde yalnızca üç istek
+                        gönderebilirsin.
+                      </DialogDescription>
+                    </DialogHeader>
+                    <div className='grid gap-4 py-4'>
+                      <div className='flex flex-row gap-4 justify-items-stretch'>
+                        <Image
+                          src='/img/ara-beni-lutfen.webp'
+                          alt='logo'
+                          width={64}
+                          height={64}
+                          className='rounded-lg border border-slate-800 h-[64px] w-[64px]'
+                        />
+                        <div className='flex flex-col '>
+                          <p className='text-lg'>Ara Beni Lütfen</p>
+                          <p className='text-lg text-muted-foreground'>Kenan Doğulu</p>
+                        </div>
+                      </div>
+                      <Form {...form}>
+                        <form onSubmit={form.handleSubmit(onSubmit)}>
+                          <FormField
+                            control={form.control}
+                            name='instagramHandle'
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel>Instagram Adın</FormLabel>
+                                <FormControl>
+                                  <Input
+                                    className='col-span-3'
+                                    placeholder='@ ile başlayan Instagram adın'
+                                    {...field}
+                                  />
+                                </FormControl>
+                                <FormDescription>Instagram adın gönderdiğin isteğin yanında görünecek.</FormDescription>
+                              </FormItem>
+                            )}
+                          />
+                        </form>
+                      </Form>
                     </div>
-                  </div>
-                </div>
-
-                <div className='flex flex-col gap-4'>
-                  <div className='flex flex-row gap-4 justify-items-stretch'>
-                    <div className='w-[64px] h-[64px] bg-slate-300 rounded-lg'></div>
-                    <div className='flex flex-col justify-center'>
-                      <p className='text-lg'>Ara Beni Lütfen</p>
-                      <p className='text-lg text-muted-foreground'>Kenan Doğulu</p>
+                    <DialogFooter>
+                      <DialogClose asChild>
+                        <Button type='submit'>İsteği Gönder</Button>
+                      </DialogClose>
+                    </DialogFooter>
+                  </DialogContent>
+                </Dialog>
+                <Dialog>
+                  <DialogTrigger asChild>
+                    <div className='flex flex-row gap-4 justify-items-stretch'>
+                      <Image
+                        src='/img/ara-beni-lutfen.webp'
+                        alt='logo'
+                        width={64}
+                        height={64}
+                        className='rounded-lg border border-slate-800 h-[64px] w-[64px]'
+                      />
+                      <div className='flex flex-col'>
+                        <p className='text-lg'>Ara Beni Lütfen</p>
+                        <p className='text-lg text-muted-foreground'>Kenan Doğulu</p>
+                      </div>
                     </div>
-                  </div>
-                </div>
+                  </DialogTrigger>
+                  <DialogContent className='sm:max-w-[425px]'>
+                    <DialogHeader>
+                      <DialogTitle>Müzik İsteği Gönder</DialogTitle>
+                      <DialogDescription>
+                        Aşağıya instagram ismini yaz ve isteğini gönder. Unutma, günde yalnızca üç istek
+                        gönderebilirsin.
+                      </DialogDescription>
+                    </DialogHeader>
+                    <div className='grid gap-4 py-4'>
+                      <div className='flex flex-row gap-4 justify-items-stretch'>
+                        <Image
+                          src='/img/ara-beni-lutfen.webp'
+                          alt='logo'
+                          width={64}
+                          height={64}
+                          className='rounded-lg border border-slate-800 h-[64px] w-[64px]'
+                        />
+                        <div className='flex flex-col '>
+                          <p className='text-lg'>Ara Beni Lütfen</p>
+                          <p className='text-lg text-muted-foreground'>Kenan Doğulu</p>
+                        </div>
+                      </div>
+                      <Form {...form}>
+                        <form onSubmit={form.handleSubmit(onSubmit)}>
+                          <FormField
+                            control={form.control}
+                            name='instagramHandle'
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel>Instagram Adın</FormLabel>
+                                <FormControl>
+                                  <Input
+                                    className='col-span-3'
+                                    placeholder='@ ile başlayan Instagram adın'
+                                    {...field}
+                                  />
+                                </FormControl>
+                                <FormDescription>Instagram adın gönderdiğin isteğin yanında görünecek.</FormDescription>
+                              </FormItem>
+                            )}
+                          />
+                        </form>
+                      </Form>
+                    </div>
+                    <DialogFooter>
+                      <DialogClose asChild>
+                        <Button type='submit'>İsteği Gönder</Button>
+                      </DialogClose>
+                    </DialogFooter>
+                  </DialogContent>
+                </Dialog>
+                <Dialog>
+                  <DialogTrigger asChild>
+                    <div className='flex flex-row gap-4 justify-items-stretch'>
+                      <Image
+                        src='/img/ara-beni-lutfen.webp'
+                        alt='logo'
+                        width={64}
+                        height={64}
+                        className='rounded-lg border border-slate-800 h-[64px] w-[64px]'
+                      />
+                      <div className='flex flex-col'>
+                        <p className='text-lg'>Ara Beni Lütfen</p>
+                        <p className='text-lg text-muted-foreground'>Kenan Doğulu</p>
+                      </div>
+                    </div>
+                  </DialogTrigger>
+                  <DialogContent className='sm:max-w-[425px]'>
+                    <DialogHeader>
+                      <DialogTitle>Müzik İsteği Gönder</DialogTitle>
+                      <DialogDescription>
+                        Aşağıya instagram ismini yaz ve isteğini gönder. Unutma, günde yalnızca üç istek
+                        gönderebilirsin.
+                      </DialogDescription>
+                    </DialogHeader>
+                    <div className='grid gap-4 py-4'>
+                      <div className='flex flex-row gap-4 justify-items-stretch'>
+                        <Image
+                          src='/img/ara-beni-lutfen.webp'
+                          alt='logo'
+                          width={64}
+                          height={64}
+                          className='rounded-lg border border-slate-800 h-[64px] w-[64px]'
+                        />
+                        <div className='flex flex-col '>
+                          <p className='text-lg'>Ara Beni Lütfen</p>
+                          <p className='text-lg text-muted-foreground'>Kenan Doğulu</p>
+                        </div>
+                      </div>
+                      <Form {...form}>
+                        <form onSubmit={form.handleSubmit(onSubmit)}>
+                          <FormField
+                            control={form.control}
+                            name='instagramHandle'
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel>Instagram Adın</FormLabel>
+                                <FormControl>
+                                  <Input
+                                    className='col-span-3'
+                                    placeholder='@ ile başlayan Instagram adın'
+                                    {...field}
+                                  />
+                                </FormControl>
+                                <FormDescription>Instagram adın gönderdiğin isteğin yanında görünecek.</FormDescription>
+                              </FormItem>
+                            )}
+                          />
+                        </form>
+                      </Form>
+                    </div>
+                    <DialogFooter>
+                      <DialogClose asChild>
+                        <Button type='submit'>İsteği Gönder</Button>
+                      </DialogClose>
+                    </DialogFooter>
+                  </DialogContent>
+                </Dialog>
               </>
             )}
           </div>
