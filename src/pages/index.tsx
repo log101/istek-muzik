@@ -176,239 +176,70 @@ export default function Home() {
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <div className='flex flex-row justify-between space-x-2'>
-              <Dialog>
-                <DialogTrigger asChild>
-                  <div className='flex flex-row gap-4 justify-items-stretch'>
+            <div className='grid grid-cols-2 md:grid-cols-4 gap-4'>
+              {[1, 2, 3, 4].map(val => (
+                <Dialog key={val}>
+                  <DialogTrigger asChild>
                     <Image
                       src='/img/ara-beni-lutfen.webp'
                       alt='logo'
-                      width={64}
-                      height={64}
-                      className='rounded-lg border border-slate-800 h-[64px] w-[64px]'
+                      width={512}
+                      height={512}
+                      className='rounded-lg border border-slate-800 w-max-[256px]'
                     />
-                  </div>
-                </DialogTrigger>
-                <DialogContent className='sm:max-w-[425px]'>
-                  <DialogHeader>
-                    <DialogTitle>Müzik İsteği Gönder</DialogTitle>
-                    <DialogDescription>
-                      Aşağıya instagram ismini yaz ve isteğini gönder. Unutma, günde yalnızca üç istek gönderebilirsin.
-                    </DialogDescription>
-                  </DialogHeader>
-                  <div className='grid gap-4 py-4'>
-                    <div className='flex flex-row gap-4 justify-items-stretch'>
-                      <Image
-                        src='/img/ara-beni-lutfen.webp'
-                        alt='logo'
-                        width={64}
-                        height={64}
-                        className='rounded-lg border border-slate-800 h-[64px] w-[64px]'
-                      />
-                      <div className='flex flex-col '>
-                        <p className='text-lg'>Ara Beni Lütfen</p>
-                        <p className='text-lg text-muted-foreground'>Kenan Doğulu</p>
-                      </div>
-                    </div>
-                    <Form {...form}>
-                      <form onSubmit={form.handleSubmit(onSubmit)}>
-                        <FormField
-                          control={form.control}
-                          name='instagramHandle'
-                          render={({ field }) => (
-                            <FormItem>
-                              <FormLabel>Instagram Adın</FormLabel>
-                              <FormControl>
-                                <Input className='col-span-3' placeholder='@ ile başlayan Instagram adın' {...field} />
-                              </FormControl>
-                              <FormDescription>Instagram adın gönderdiğin isteğin yanında görünecek.</FormDescription>
-                            </FormItem>
-                          )}
+                  </DialogTrigger>
+                  <DialogContent className='sm:max-w-[425px]'>
+                    <DialogHeader>
+                      <DialogTitle>Müzik İsteği Gönder</DialogTitle>
+                      <DialogDescription>
+                        Aşağıya instagram ismini yaz ve isteğini gönder. Unutma, günde yalnızca üç istek
+                        gönderebilirsin.
+                      </DialogDescription>
+                    </DialogHeader>
+                    <div className='grid gap-4 py-4'>
+                      <div className='flex flex-row gap-4 justify-items-stretch'>
+                        <Image
+                          src='/img/ara-beni-lutfen.webp'
+                          alt='logo'
+                          width={64}
+                          height={64}
+                          className='rounded-lg border border-slate-800 h-[64px] w-[64px]'
                         />
-                      </form>
-                    </Form>
-                  </div>
-                  <DialogFooter>
-                    <DialogClose asChild>
-                      <Button type='submit'>İsteği Gönder</Button>
-                    </DialogClose>
-                  </DialogFooter>
-                </DialogContent>
-              </Dialog>
-              <Dialog>
-                <DialogTrigger asChild>
-                  <div className='flex flex-row gap-4 justify-items-stretch'>
-                    <Image
-                      src='/img/ara-beni-lutfen.webp'
-                      alt='logo'
-                      width={64}
-                      height={64}
-                      className='rounded-lg border border-slate-800 h-[64px] w-[64px]'
-                    />
-                  </div>
-                </DialogTrigger>
-                <DialogContent className='sm:max-w-[425px]'>
-                  <DialogHeader>
-                    <DialogTitle>Müzik İsteği Gönder</DialogTitle>
-                    <DialogDescription>
-                      Aşağıya instagram ismini yaz ve isteğini gönder. Unutma, günde yalnızca üç istek gönderebilirsin.
-                    </DialogDescription>
-                  </DialogHeader>
-                  <div className='grid gap-4 py-4'>
-                    <div className='flex flex-row gap-4 justify-items-stretch'>
-                      <Image
-                        src='/img/ara-beni-lutfen.webp'
-                        alt='logo'
-                        width={64}
-                        height={64}
-                        className='rounded-lg border border-slate-800 h-[64px] w-[64px]'
-                      />
-                      <div className='flex flex-col '>
-                        <p className='text-lg'>Ara Beni Lütfen</p>
-                        <p className='text-lg text-muted-foreground'>Kenan Doğulu</p>
+                        <div className='flex flex-col '>
+                          <p className='text-lg'>Ara Beni Lütfen</p>
+                          <p className='text-lg text-muted-foreground'>Kenan Doğulu</p>
+                        </div>
                       </div>
+                      <Form {...form}>
+                        <form onSubmit={form.handleSubmit(onSubmit)}>
+                          <FormField
+                            control={form.control}
+                            name='instagramHandle'
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel>Instagram Adın</FormLabel>
+                                <FormControl>
+                                  <Input
+                                    className='col-span-3'
+                                    placeholder='@ ile başlayan Instagram adın'
+                                    {...field}
+                                  />
+                                </FormControl>
+                                <FormDescription>Instagram adın gönderdiğin isteğin yanında görünecek.</FormDescription>
+                              </FormItem>
+                            )}
+                          />
+                        </form>
+                      </Form>
                     </div>
-                    <Form {...form}>
-                      <form onSubmit={form.handleSubmit(onSubmit)}>
-                        <FormField
-                          control={form.control}
-                          name='instagramHandle'
-                          render={({ field }) => (
-                            <FormItem>
-                              <FormLabel>Instagram Adın</FormLabel>
-                              <FormControl>
-                                <Input className='col-span-3' placeholder='@ ile başlayan Instagram adın' {...field} />
-                              </FormControl>
-                              <FormDescription>Instagram adın gönderdiğin isteğin yanında görünecek.</FormDescription>
-                            </FormItem>
-                          )}
-                        />
-                      </form>
-                    </Form>
-                  </div>
-                  <DialogFooter>
-                    <DialogClose asChild>
-                      <Button type='submit'>İsteği Gönder</Button>
-                    </DialogClose>
-                  </DialogFooter>
-                </DialogContent>
-              </Dialog>
-              <Dialog>
-                <DialogTrigger asChild>
-                  <div className='flex flex-row gap-4 justify-items-stretch'>
-                    <Image
-                      src='/img/ara-beni-lutfen.webp'
-                      alt='logo'
-                      width={64}
-                      height={64}
-                      className='rounded-lg border border-slate-800 h-[64px] w-[64px]'
-                    />
-                  </div>
-                </DialogTrigger>
-                <DialogContent className='sm:max-w-[425px]'>
-                  <DialogHeader>
-                    <DialogTitle>Müzik İsteği Gönder</DialogTitle>
-                    <DialogDescription>
-                      Aşağıya instagram ismini yaz ve isteğini gönder. Unutma, günde yalnızca üç istek gönderebilirsin.
-                    </DialogDescription>
-                  </DialogHeader>
-                  <div className='grid gap-4 py-4'>
-                    <div className='flex flex-row gap-4 justify-items-stretch'>
-                      <Image
-                        src='/img/ara-beni-lutfen.webp'
-                        alt='logo'
-                        width={64}
-                        height={64}
-                        className='rounded-lg border border-slate-800 h-[64px] w-[64px]'
-                      />
-                      <div className='flex flex-col '>
-                        <p className='text-lg'>Ara Beni Lütfen</p>
-                        <p className='text-lg text-muted-foreground'>Kenan Doğulu</p>
-                      </div>
-                    </div>
-                    <Form {...form}>
-                      <form onSubmit={form.handleSubmit(onSubmit)}>
-                        <FormField
-                          control={form.control}
-                          name='instagramHandle'
-                          render={({ field }) => (
-                            <FormItem>
-                              <FormLabel>Instagram Adın</FormLabel>
-                              <FormControl>
-                                <Input className='col-span-3' placeholder='@ ile başlayan Instagram adın' {...field} />
-                              </FormControl>
-                              <FormDescription>Instagram adın gönderdiğin isteğin yanında görünecek.</FormDescription>
-                            </FormItem>
-                          )}
-                        />
-                      </form>
-                    </Form>
-                  </div>
-                  <DialogFooter>
-                    <DialogClose asChild>
-                      <Button type='submit'>İsteği Gönder</Button>
-                    </DialogClose>
-                  </DialogFooter>
-                </DialogContent>
-              </Dialog>
-              <Dialog>
-                <DialogTrigger asChild>
-                  <div className='flex flex-row gap-4 justify-items-stretch'>
-                    <Image
-                      src='/img/ara-beni-lutfen.webp'
-                      alt='logo'
-                      width={64}
-                      height={64}
-                      className='rounded-lg border border-slate-800 h-[64px] w-[64px]'
-                    />
-                  </div>
-                </DialogTrigger>
-                <DialogContent className='sm:max-w-[425px]'>
-                  <DialogHeader>
-                    <DialogTitle>Müzik İsteği Gönder</DialogTitle>
-                    <DialogDescription>
-                      Aşağıya instagram ismini yaz ve isteğini gönder. Unutma, günde yalnızca üç istek gönderebilirsin.
-                    </DialogDescription>
-                  </DialogHeader>
-                  <div className='grid gap-4 py-4'>
-                    <div className='flex flex-row gap-4 justify-items-stretch'>
-                      <Image
-                        src='/img/ara-beni-lutfen.webp'
-                        alt='logo'
-                        width={64}
-                        height={64}
-                        className='rounded-lg border border-slate-800 h-[64px] w-[64px]'
-                      />
-                      <div className='flex flex-col '>
-                        <p className='text-lg'>Ara Beni Lütfen</p>
-                        <p className='text-lg text-muted-foreground'>Kenan Doğulu</p>
-                      </div>
-                    </div>
-                    <Form {...form}>
-                      <form onSubmit={form.handleSubmit(onSubmit)}>
-                        <FormField
-                          control={form.control}
-                          name='instagramHandle'
-                          render={({ field }) => (
-                            <FormItem>
-                              <FormLabel>Instagram Adın</FormLabel>
-                              <FormControl>
-                                <Input className='col-span-3' placeholder='@ ile başlayan Instagram adın' {...field} />
-                              </FormControl>
-                              <FormDescription>Instagram adın gönderdiğin isteğin yanında görünecek.</FormDescription>
-                            </FormItem>
-                          )}
-                        />
-                      </form>
-                    </Form>
-                  </div>
-                  <DialogFooter>
-                    <DialogClose asChild>
-                      <Button type='submit'>İsteği Gönder</Button>
-                    </DialogClose>
-                  </DialogFooter>
-                </DialogContent>
-              </Dialog>
+                    <DialogFooter>
+                      <DialogClose asChild>
+                        <Button type='submit'>İsteği Gönder</Button>
+                      </DialogClose>
+                    </DialogFooter>
+                  </DialogContent>
+                </Dialog>
+              ))}
             </div>
           </CardContent>
         </Card>
