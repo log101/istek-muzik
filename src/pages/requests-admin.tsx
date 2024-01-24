@@ -27,7 +27,7 @@ export default function Home() {
       <Separator />
 
       <div className='container flex flex-col space-y-6 py-4 h-full'>
-        <div className='flex flex-col gap-4'>
+        <div className='flex flex-col gap-6'>
           <div>
             <h1 className='scroll-m-20 text-4xl font-extrabold tracking-tight lg:text-5xl'>Müzik İstekleri</h1>
             <p className='leading-7 [&:not(:first-child)]:mt-6'>
