@@ -16,7 +16,6 @@ import {
   DialogTitle,
   DialogTrigger
 } from "@/components/ui/dialog"
-import { Label } from "@/components/ui/label"
 import { useState } from "react"
 import useSWR, { Fetcher } from "swr"
 import { useRouter } from "next/router"
@@ -132,9 +131,9 @@ export default function NewRequestPage() {
                 </DialogTrigger>
                 <DialogContent className='sm:max-w-[425px]'>
                   <DialogHeader>
-                    <DialogTitle>Müzik İsteği Gönder</DialogTitle>
+                    <DialogTitle>Şarkıyı Tavsiyelerine Ekle</DialogTitle>
                     <DialogDescription>
-                      Aşağıya instagram ismini yaz ve isteğini gönder. Unutma, günde yalnızca üç istek gönderebilirsin.
+                      Onayladığında şarkı müşterilere tavsiye ettiğin şarkılara eklenecek.
                     </DialogDescription>
                   </DialogHeader>
                   <div className='grid gap-4 py-4'>
@@ -151,15 +150,13 @@ export default function NewRequestPage() {
                         <p className='text-lg text-muted-foreground'>{track.artists?.[0].name}</p>
                       </div>
                     </div>
-                    <div className='grid grid-cols-4 items-center gap-4'>
-                      <Label htmlFor='name' className='text-right'>
-                        Instagram Adın
-                      </Label>
-                      <Input id='name' value='' className='col-span-3' placeholder='@ ile başlayan Instagram adın' />
-                    </div>
                   </div>
                   <DialogFooter>
-                    <Button type='submit'>İsteği Gönder</Button>
+                    <DialogClose asChild>
+                      <Button size='lg' type='submit' className='text-lg'>
+                        Tavsiyelere Ekle
+                      </Button>
+                    </DialogClose>
                   </DialogFooter>
                 </DialogContent>
               </Dialog>

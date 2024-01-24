@@ -63,7 +63,7 @@ export default function Home() {
             <p className='text-xl text-muted-foreground'>@mado.kizilay</p>
           </div>
         </div>
-        <div>
+        <div className='flex flex-col gap-2'>
           <Dialog>
             <DialogTrigger asChild>
               <Button className='w-full text-lg' size='lg'>
