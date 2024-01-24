@@ -120,7 +120,7 @@ export default function Home() {
         <Separator />
         <div className='flex flex-col gap-3'>
           <div className='flex flex-row justify-between items-center'>
-            <Link href={"#"} className='text-lg flex flex-row items-center'>
+            <Link href='/recommendations' className='text-lg flex flex-row items-center'>
               <Music className='mr-4' /> Müzik Tavsiyelerin
             </Link>
             <ChevronRight />
