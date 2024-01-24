@@ -16,7 +16,7 @@ export default function Home() {
       <div className='container flex flex-col space-y-6 py-8 h-full'>
         <p className='text-center'>Bu sayfa gösterim amaçlıdır, asıl üründe olmayacaktır.</p>
 
-        <Link href='/profile' className='w-full h-full'>
+        <Link href='/requests-admin' className='w-full h-full'>
           <div className='w-full h-full border-2 border-slate-600 rounded-xl flex flex-col gap-4 justify-center items-center hover:bg-slate-100'>
             <Store size={64} className='border-slate-600' />
             <p className='text-3xl'>Mekan</p>
